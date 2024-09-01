@@ -4,58 +4,45 @@
 //
 //  Created by Mohammad Mendahawi on 8/30/24.
 //
-
 import SwiftUI
-import SwiftData
 
 struct ContentView: View {
-    @Environment(\.modelContext) private var modelContext
-    @Query private var items: [Item]
-
+    @State private var city: String = ""
+    @State private var navigateToCityView = false
+    
     var body: some View {
-        NavigationSplitView {
-            List {
-                ForEach(items) { item in
-                    NavigationLink {
-                        Text("Item at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
-                    } label: {
-                        Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
+        NavigationStack {
+            ZStack{
+                LinearGradient(gradient: Gradient(colors: [.blue, .white]), startPoint: .bottomTrailing, endPoint: .topTrailing)
+                    .edgesIgnoringSafeArea(.all)
+                VStack {
+                    TextField("Enter City, State", text: $city)
+                        .padding()
+                        .background(Color.gray.opacity(0.2))
+                        .cornerRadius(8)
+                        .padding()
+                        .onSubmit {
+                            if !city.isEmpty {
+                                navigateToCityView = true
+                            }
+                        }
+                    
+                    NavigationLink(
+                        destination: City(place: city),
+                        isActive: $navigateToCityView
+                    ) {
+                        EmptyView()
                     }
+                    .hidden()
+                    .navigationTitle("Please pick City,State")
                 }
-                .onDelete(perform: deleteItems)
-            }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
-                ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
-                    }
-                }
-            }
-        } detail: {
-            Text("Select an item")
-        }
-    }
-
-    private func addItem() {
-        withAnimation {
-            let newItem = Item(timestamp: Date())
-            modelContext.insert(newItem)
-        }
-    }
-
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            for index in offsets {
-                modelContext.delete(items[index])
+                
             }
         }
     }
 }
-
-#Preview {
-    ContentView()
-        .modelContainer(for: Item.self, inMemory: true)
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        ContentView()
+    }
 }

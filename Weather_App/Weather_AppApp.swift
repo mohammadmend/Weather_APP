@@ -10,6 +10,7 @@ import SwiftData
 
 @main
 struct Weather_AppApp: App {
+    @StateObject private var locationManager = LocationManager()  
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             Item.self,
@@ -26,6 +27,7 @@ struct Weather_AppApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environmentObject(locationManager)  
         }
         .modelContainer(sharedModelContainer)
     }
